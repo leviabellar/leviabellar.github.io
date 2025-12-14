@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Levi Abellar | Portfolio</title>
+  <style>
+    :root { --bg:#0b0f17; --card:#121a2a; --text:#e8eefc; --muted:#a9b7d6; --line:#22304a; }
+    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    a { color:inherit; }
+    .wrap { max-width:1100px; margin:0 auto; padding:28px 18px 60px; }
+    header { display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .title h1 { margin:0; font-size:28px; }
+    .title p { margin:6px 0 0; color:var(--muted); }
+    .links { display:flex; gap:10px; flex-wrap:wrap; }
+    .pill { padding:10px 12px; border:1px solid var(--line); border-radius:999px; text-decoration:none; }
+    section { margin-top:26px; }
+    h2 { margin:0 0 12px; font-size:18px; color:var(--muted); letter-spacing:.2px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    iframe { width:100%; height:560px; border:0; border-radius:14px; background:#0a0e16; }
+    .note { color:var(--muted); font-size:13px; margin-top:10px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; }
+    .repo h3 { margin:0 0 8px; font-size:16px; }
+    .repo p { margin:0 0 10px; color:var(--muted); font-size:14px; line-height:1.35; }
+    .meta { display:flex; gap:10px; color:var(--muted); font-size:12px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Levi Abellar</h1>
+        <p>Flutter • Web • APIs</p>
+      </div>
+      <nav class="links">
+        <a class="pill" href="https://github.com/leviabellar" target="_blank" rel="noreferrer">GitHub</a>
+        <a class="pill" href="mailto:buddyabellar@gmail.com">Email</a>
+        <!-- Add LinkedIn/Resume -->
+      </nav>
+    </header>
+
+    <section>
+      <h2>Featured (Flutter embed)</h2>
+      <div class="card">
+        <!-- This path matches: /showcase/crusher/index.html in your Pages repo -->
+        <iframe src="./showcase/crusher/index.html" title="Crusher widget demo"></iframe>
+        <div class="note">Embedded Flutter Web build of a widget extracted from your crusher project.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Latest repos</h2>
+      <div id="repoGrid" class="grid"></div>
+    </section>
+  </div>
+
+  <script>
+    const user = "leviabellar";
+    const grid = document.getElementById("repoGrid");
+
+    function repoCard(r) {
+      const desc = (r.description || "").slice(0, 140);
+      const lang = r.language || "—";
+      return `
+        <div class="card repo">
+          <h3><a href="${r.html_url}" target="_blank" rel="noreferrer">${r.name}</a></h3>
+          <p>${desc || "No description yet."}</p>
+          <div class="meta">
+            <span>★ ${r.stargazers_count}</span>
+            <span>${lang}</span>
+            <span>Updated ${new Date(r.pushed_at).toLocaleDateString()}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`)
+      .then(r => r.json())
+      .then(repos => {
+        const filtered = repos
+          .filter(r => !r.fork && !r.archived)
+          .slice(0, 8);
+        grid.innerHTML = filtered.map(repoCard).join("");
+      })
+      .catch(() => {
+        grid.innerHTML = `<div class="card">Couldn’t load repos. <a href="https://github.com/${user}" target="_blank" rel="noreferrer">Open GitHub</a></div>`;
+      });
+  </script>
+</body>
+</html>
